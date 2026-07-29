@@ -1,85 +1,76 @@
-/*-------------------------------- Constants --------------------------------*/
-
-/*-------------------------------- Variables --------------------------------*/
-let number_1 = '';
-let number_2 = '';
+/* -------------------------------- Constants --------------------------------*/
+/* -------------------------------- State --------------------------------*/
+let firstNum = '';
+let secondNum = '';
 let operator = '';
-let total = 0;
+let result = 0;
 
+/* ------------------------ Cached Element References ------------------------*/
+const calcEl = document.querySelector('#calculator');
+const displayEl = document.querySelector('.display');
 
-
-
-/*------------------------ Cached Element References ------------------------*/
-
-
-const buttons = document.querySelectorAll('.button');
-const display = document.querySelector('#display');
-const calculator = document.querySelector('#calculator');
-
-function handleClick(event) {
-
-
-
+/* -------------------------------- Functions --------------------------------*/
+function render(value, replace = true) {
+    if (replace) {
+        displayEl.textContent = value;
+    } else {
+        displayEl.textContent += value;
+    }
 }
 
-/*----------------------------- Event Listeners -----------------------------*/
-calculator.addEventListener("click", handleClick);
+function calculateResult() {
+    const parseFirst = parseInt(firstNum);
+    const parseSecond = parseInt(secondNum);
 
-/*-------------------------------- Functions --------------------------------*/
-
-
-
-
-
-buttons.forEach((button) => {
-    button.addEventListener('click', (event) => {
-        // This log is for testing purposes to verify we're getting the correct value
-        console.log(event.target.innerText);
-        // Future logic to capture the button's value would go here...
-    });
-});
-
-
-calculator.addEventListener('click', (event) => {
-    // This log is for testing purposes to verify we're getting the correct value
-    // You have to click a button to see this log
-    //console.log(event.target.innerText);
-
-    // Example
-    if (event.target.classList.contains('number')) {
-
-    }
-
-    if (event.target.innerText === '+') {
-        total += number_1 + number_2
-
-        console.log(total)
-
-    }
-
-    if (event.target.innerText === '-') {
-        total -= number_1 - number_2
-        console.log(total)
-
-    }
-
-    // Example
-    if (event.target.innerText === '*') {
-        total *= number_1 * number_2
-        console.log(total)
-
-    }
-
-    if (event.target.innerText === '/') {
-        total /= number_1 / number_2
-        if (event.target.innerText === '=') {
-            console.log(total)
+    if (operator === '+') {
+        result = parseFirst + parseSecond;
+    } else if (operator === '-') {
+        result = parseFirst - parseSecond;
+    } else if (operator === '*') {
+        result = parseFirst * parseSecond;
+    } else if (operator === '/') {
+        if (parseSecond === 0) {
+            result = 'error';
+        } else {
+            result = parseFirst / parseSecond;
         }
     }
 
-    if (event.target.innerText === 'c') {
-        total = 0;
-        console.log(total)
+    render(result);
+}
 
+function reset() {
+    firstNum = '';
+    secondNum = '';
+    operator = '';
+    result = 0;
+    render(result);
+}
+
+function getNumber(el) {
+    if (operator) {
+        secondNum += el.textContent;
+        render(secondNum);
+    } else {
+        firstNum += el.textContent;
+        render(firstNum);
+    }
+}
+
+/* ----------------------------- Event Listeners -----------------------------*/
+calcEl.addEventListener('click', function(e) {
+    const clickedEl = e.target;
+
+    if (clickedEl.classList.contains('number')) {
+        getNumber(clickedEl);
+    } else if (clickedEl.classList.contains('operator')) {
+        if (clickedEl.textContent.toLowerCase() === 'c') {
+            reset();
+        } else {
+            operator = clickedEl.textContent;
+            render(operator, false);
+        }
+    } else if (clickedEl.classList.contains('equals')) {
+        calculateResult();
     }
 });
